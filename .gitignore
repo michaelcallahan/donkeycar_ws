@@ -2,4 +2,7 @@
 /build
 /install
 /log
+/src/build
+/src/install
+/src/log
 /set_gpio_permissions.sh
