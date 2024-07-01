@@ -1,0 +1,5 @@
+/.vscode
+/build
+/install
+/log
+/set_gpio_permissions.sh
