@@ -17,11 +17,6 @@ pkg_check_modules(LIBCAMERA REQUIRED libcamera)
 
 include_directories(/usr/include)
 link_directories(/usr/share)
-link_directories(/usr/lib)
-link_directories(/usr/lib/aarch64-linux-gnu)
-include_directories(/usr/include/libcamera)
-link_directories(/usr/share/libcamera)
-link_directories(/usr/lib/aarch64-linux-gnu/libcamera)
 
 include_directories(${OpenCV_INCLUDE_DIRS} ${LIBCAMERA_INCLUDE_DIRS})
 
@@ -34,5 +29,11 @@ target_link_libraries(camera_node ${OpenCV_LIBRARIES} ${LIBCAMERA_LIBRARIES})
 install(TARGETS
   camera_node
   DESTINATION lib/${PROJECT_NAME})
+
+# Install launch files.
+install(DIRECTORY
+launch
+DESTINATION share/${PROJECT_NAME}/
+)
 
 ament_package()

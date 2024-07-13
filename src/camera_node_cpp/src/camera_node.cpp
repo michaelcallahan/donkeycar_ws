@@ -102,24 +102,38 @@ private:
         }
 
         const std::vector<std::unique_ptr<libcamera::FrameBuffer>> &buffers = allocator->buffers(streamConfig.stream());
-        for (const std::unique_ptr<libcamera::FrameBuffer> &buffer : buffers) {
-            frame_buffers_.push_back(buffer.get());
+        for (size_t i = 0; i < buffers.size(); ++i) {
+            if (!buffers[i]) {
+                RCLCPP_ERROR(this->get_logger(), "Invalid buffer at index %zu", i);
+                return;
+            }
+            RCLCPP_INFO(this->get_logger(), "Buffer %zu allocated", i);
+            frame_buffers_.push_back(buffers[i].get());
         }
 
         RCLCPP_INFO(this->get_logger(), "Creating requests");
-        for (libcamera::FrameBuffer *buffer : frame_buffers_) {
-            std::unique_ptr<libcamera::Request> request = camera_->createRequest();
-            if (!request) {
-                RCLCPP_ERROR(this->get_logger(), "Failed to create request");
+        for (size_t i = 0; i < frame_buffers_.size(); ++i) {
+            libcamera::FrameBuffer *buffer = frame_buffers_[i];
+            if (!buffer) {
+                RCLCPP_ERROR(this->get_logger(), "Invalid frame buffer at index %zu", i);
                 return;
             }
 
+            std::unique_ptr<libcamera::Request> request = camera_->createRequest();
+            if (!request) {
+                RCLCPP_ERROR(this->get_logger(), "Failed to create request %zu", i);
+                return;
+            }
+
+            RCLCPP_INFO(this->get_logger(), "Request %zu created", i);
+
             if (request->addBuffer(streamConfig.stream(), buffer) != 0) {
-                RCLCPP_ERROR(this->get_logger(), "Failed to add buffer to request");
+                RCLCPP_ERROR(this->get_logger(), "Failed to add buffer to request %zu", i);
                 return;
             }
 
             requests_.push_back(std::move(request));
+            RCLCPP_INFO(this->get_logger(), "Request %zu added to list", i);
         }
     }
 
@@ -132,13 +146,16 @@ private:
             }
             camera_started_ = true;
         }
-        RCLCPP_INFO(this->get_logger(), "Queueing request");
-        for (auto &request : requests_) {
-            if (camera_->queueRequest(request.get()) != 0) {
-                RCLCPP_ERROR(this->get_logger(), "Failed to queue request");
+
+        RCLCPP_INFO(this->get_logger(), "Queueing requests");
+        for (size_t i = 0; i < requests_.size(); ++i) {
+            RCLCPP_INFO(this->get_logger(), "Queueing request %zu", i);
+            if (camera_->queueRequest(requests_[i].get()) != 0) {
+                RCLCPP_ERROR(this->get_logger(), "Failed to queue request %zu", i);
                 return;
             }
         }
+        RCLCPP_INFO(this->get_logger(), "All requests queued successfully");
     }
 
     void requestComplete(libcamera::Request *request) {

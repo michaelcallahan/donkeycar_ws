@@ -13,6 +13,7 @@ find_package(std_msgs REQUIRED)
 include_directories(/usr/include)
 link_directories(/usr/lib)
 include_directories(/usr/include/i2c)
+include_directories(./local/include/rpicam-apps/core)
 
 # Find and include I2C-dev
 #pkg_check_modules(I2CDEV REQUIRED i2c-dev)
