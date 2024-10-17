@@ -1,0 +1,29 @@
+launch:
+
+- node:
+    pkg: "joy"
+    exec: "joy_node"
+    name: "joy_controller"
+    namespace: "donkeycar"
+
+- node:
+    pkg: "car_control"
+    exec: "car_control_node"
+    name: "car_controller"
+    namespace: "donkeycar"
+
+- node:
+    pkg: "camera_ros"
+    exec: "camera_node"
+    name: "camera"
+    namespace: "donkeycar"
+    param:
+    -
+      name: "format"
+      value: "YUYV"
+
+- node:
+    pkg: "motor_control_cpp"
+    exec: "motor_control_node"
+    name: "motor_controller"
+    namespace: "donkeycar"
