@@ -35,3 +35,14 @@ This workspace (`donkeycar_ws`) contains ROS2 packages that replace the traditio
 ### Enable I2C on Raspberry Pi
 
 Make sure I2C is enabled on your Raspberry Pi
+
+### Connecting a controller/gamepad
+
+Using the ros joy library, it is possible to connect to a bluetooth controller and map the car controls to the joystick of the controller.
+
+Connect to controlelr using bluetoothctl:
+```bluetoothctl agent on```
+```bluetoothctl scan on```
+```bluetoothctl pair []```
+```bluetoothctl connect []```
+
