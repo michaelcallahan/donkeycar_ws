@@ -26,7 +26,7 @@ include_directories(
 )
 
 add_executable(image_streamer src/image_streamer.cpp)
-add_executable(image_streamer_2 src/image_streamer_2.cpp)
+add_executable(image_streamer_test src/image_streamer_test.cpp)
 ament_target_dependencies(image_streamer rclcpp sensor_msgs cv_bridge OpenCV)
 
 target_link_libraries(image_streamer

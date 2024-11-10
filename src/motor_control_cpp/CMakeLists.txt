@@ -20,14 +20,22 @@ include_directories(./local/include/rpicam-apps/core)
 
 include_directories(${I2CDEV_INCLUDE_DIRS})
 
-add_executable(motor_control_node src/motor_control_node_2.cpp)
+add_executable(motor_control_node src/motor_control_node.cpp)
 ament_target_dependencies(motor_control_node rclcpp std_msgs)
+
+add_executable(motor_control_node src/motor_control_node_arduino_test.cpp)
+ament_target_dependencies(motor_control_node_arduino_test rclcpp std_msgs)
 
 # Link libgpiod and I2C-dev libraries
 target_link_libraries(motor_control_node gpiod i2c)
+target_link_libraries(motor_control_node_arduino_test gpiod i2c)
 
 install(TARGETS
   motor_control_node
+  DESTINATION lib/${PROJECT_NAME})
+
+install(TARGETS
+  motor_control_node_arduino_test
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
