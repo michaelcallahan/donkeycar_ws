@@ -134,7 +134,7 @@ private:
 
         motor_speed_ = convert_to_pwm(msg->data, throttle_reverse_, throttle_zero_, throttle_forward_);
         RCLCPP_INFO(this->get_logger(), "Motor speed set to: %d", motor_speed_);
-        send_i2c_data(steer_angle_, motor_speed_); // Send data to Arduino
+        //send_i2c_data(steer_angle_, motor_speed_); // Send data to Arduino
         setPWM(0, 0, motor_speed_); // Optionally control motor driver directly
     }
 
@@ -147,7 +147,7 @@ private:
 
         steer_angle_ = convert_to_pwm(msg->data, steer_left_, steer_center_, steer_right_);
         RCLCPP_INFO(this->get_logger(), "Steering angle set to: %d", steer_angle_);
-        send_i2c_data(steer_angle_, motor_speed_); // Send data to Arduino
+        //send_i2c_data(steer_angle_, motor_speed_); // Send data to Arduino
         setPWM(1, 0, steer_angle_); // Optionally control motor driver directly
     }
 

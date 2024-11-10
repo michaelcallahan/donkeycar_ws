@@ -20,7 +20,13 @@ launch:
     param:
     -
       name: "format"
-      value: "YUYV"
+      value: "XBGR8888"
+    -
+      name: "width"
+      value: 1920
+    -
+      name: "height"
+      value: 1080
 
 - node:
     pkg: "image_streamer"

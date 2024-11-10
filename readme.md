@@ -46,3 +46,8 @@ Connect to controlelr using bluetoothctl:
 ```bluetoothctl pair []```
 ```bluetoothctl connect []```
 
+## Test Demonstration Video
+
+For a quick demonstration of the car in action, view the following video:
+
+[![Test Stream Video](https://i9.ytimg.com/vi/eLl2kFCrlWY/mqdefault.jpg?sqp=CMTmwLkG-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGH8gOSheMA8=&rs=AOn4CLBsTrAPRuijnutV3yl1W5DdDEiFEg)](https://youtu.be/eLl2kFCrlWY)
