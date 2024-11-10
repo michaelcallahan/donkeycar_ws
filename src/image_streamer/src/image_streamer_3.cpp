@@ -10,46 +10,45 @@ class ImageStreamer : public rclcpp::Node
 public:
     ImageStreamer() : Node("image_streamer")
     {
-                // Initialize GStreamer
-        gst_init(nullptr, nullptr);
+        // Parameters for GStreamer pipeline
+        this->declare_parameter<std::string>("host", "127.0.0.1");
+        this->declare_parameter<int>("port", 5000);
 
-        // Define GStreamer pipeline to stream black frames over UDP to localhost:5000
-        std::string pipeline_str = "appsrc name=appsrc ! videoconvert ! x264enc bitrate=500 tune=zerolatency ! rtph264pay config-interval=1 ! udpsink host=127.0.0.1 port=5000 sync=false";
+        this->get_parameter("host", host_);
+        this->get_parameter("port", port_);
 
-        RCLCPP_INFO(this->get_logger(), "Starting GStreamer.");
+        std::string pipeline_str = "appsrc name=appsrc ! videoconvert ! video/x-raw,format=I420 ! x264enc bitrate=500 tune=zerolatency ! rtph264pay config-interval=1 ! udpsink host=" + host_ + " port=" + std::to_string(port_) + " sync=false async=false";
 
-        // Parse and create the GStreamer pipeline
-        GError *error = nullptr;
-        pipeline_ = gst_parse_launch(pipeline_str.c_str(), &error);
-        if (!pipeline_ || error) {
-            RCLCPP_ERROR(this->get_logger(), "Failed to create GStreamer pipeline: %s", error ? error->message : "Unknown error");
-            g_clear_error(&error);
+
+        pipeline_ = gst_parse_launch(pipeline_str.c_str(), NULL);
+        if (!pipeline_) {
+            RCLCPP_ERROR(this->get_logger(), "Failed to create GStreamer pipeline");
+            rclcpp::shutdown();
             return;
         }
 
-        RCLCPP_INFO(this->get_logger(), "Retrieve appsrc.");
-
-        // Retrieve appsrc from the pipeline
         appsrc_ = gst_bin_get_by_name(GST_BIN(pipeline_), "appsrc");
-        g_signal_connect(appsrc_, "need-data", G_CALLBACK(start_feed), this);
         if (!appsrc_) {
             RCLCPP_ERROR(this->get_logger(), "Failed to get appsrc element from pipeline");
             gst_object_unref(pipeline_);
+            rclcpp::shutdown();
             return;
         }
 
-        // Configure appsrc properties for continuous streaming
-        g_object_set(G_OBJECT(appsrc_), 
-                     "format", GST_FORMAT_TIME, 
-                     "is-live", TRUE, 
-                     "block", TRUE, 
-                     "do-timestamp", TRUE, 
-                     "caps", gst_caps_from_string("video/x-raw,format=I420,width=1920,height=1080,framerate=30/1"), 
-                     NULL);
+        // Set appsrc properties
+        g_object_set(G_OBJECT(appsrc_), "format", GST_FORMAT_TIME, NULL);
+        g_signal_connect(appsrc_, "need-data", G_CALLBACK(start_feed), this);
 
-        RCLCPP_INFO(this->get_logger(), "Start pipeline.");
+        // Start the GStreamer pipeline
+        gst_element_set_state(pipeline_, GST_STATE_PLAYING);
 
         GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
+        if (ret != GST_STATE_CHANGE_SUCCESS) {
+            RCLCPP_ERROR(this->get_logger(), "GStreamer pipeline failed to transition to PLAYING");
+        } else {
+            RCLCPP_INFO(this->get_logger(), "GStreamer pipeline is now PLAYING");
+        }
+
 
         // Subscribe to the image topic
         subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
@@ -89,26 +88,24 @@ private:
         cv::Mat frame;
         cv::cvtColor(cv_ptr->image, frame, cv::COLOR_BGR2YUV_I420);
 
-        // Convert OpenCV frame to GStreamer buffer
+        // Encode the frame to pass it as a buffer to appsrc
         GstBuffer *gst_buffer = gst_buffer_new_allocate(NULL, frame.total() * frame.elemSize(), NULL);
         GstMapInfo map;
         gst_buffer_map(gst_buffer, &map, GST_MAP_WRITE);
         memcpy(map.data, frame.data, frame.total() * frame.elemSize());
         gst_buffer_unmap(gst_buffer, &map);
 
-        // Push the buffer to appsrc
+        // Push the buffer to GStreamer appsrc
         GstFlowReturn ret;
         g_signal_emit_by_name(appsrc_, "push-buffer", gst_buffer, &ret);
         gst_buffer_unref(gst_buffer);
 
         if (ret != GST_FLOW_OK) {
-            RCLCPP_ERROR(this->get_logger(), "Failed to push buffer to GStreamer pipeline: %d", ret);
+            RCLCPP_ERROR(this->get_logger(), "Failed to push buffer to GStreamer pipeline");
+            need_data_ = false;
         } else {
-            RCLCPP_INFO(this->get_logger(), "Buffer pushed to GStreamer pipeline (size: %zu bytes)", frame.total() * frame.elemSize());
+            RCLCPP_INFO(this->get_logger(), "Buffer successfully pushed to GStreamer pipeline");
         }
-
-        // Stream at ~30 FPS
-        //std::this_thread::sleep_for(std::chrono::milliseconds(33));
     }
 
     std::string host_;
@@ -122,7 +119,6 @@ private:
 
 int main(int argc, char *argv[])
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     gst_init(&argc, &argv);
     rclcpp::init(argc, argv);
     auto node = std::make_shared<ImageStreamer>();

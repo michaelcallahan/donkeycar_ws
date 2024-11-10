@@ -26,6 +26,7 @@ include_directories(
 )
 
 add_executable(image_streamer src/image_streamer.cpp)
+add_executable(image_streamer_2 src/image_streamer_2.cpp)
 ament_target_dependencies(image_streamer rclcpp sensor_msgs cv_bridge OpenCV)
 
 target_link_libraries(image_streamer
@@ -35,8 +36,19 @@ target_link_libraries(image_streamer
   ${cv_bridge_LIBRARIES}
 )
 
+target_link_libraries(image_streamer_2
+  ${OpenCV_LIBRARIES}
+  ${GST_LIBRARIES}
+  ${GST_APP_LIBRARIES}
+  ${cv_bridge_LIBRARIES}
+)
+
 install(TARGETS
   image_streamer
+  DESTINATION lib/${PROJECT_NAME})
+
+  install(TARGETS
+  image_streamer_2
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()

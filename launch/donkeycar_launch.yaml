@@ -23,6 +23,12 @@ launch:
       value: "YUYV"
 
 - node:
+    pkg: "image_streamer"
+    exec: "image_streamer"
+    name: "image_streamer"
+    namespace: "donkeycar"
+
+- node:
     pkg: "motor_control_cpp"
     exec: "motor_control_node"
     name: "motor_controller"
