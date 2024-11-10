@@ -23,7 +23,7 @@ private:
         auto steer_msg = std_msgs::msg::Float32();
 
         // Assuming left stick vertical axis is for speed and horizontal axis is for steering
-        speed_msg.data = msg->axes[1]; // Adjust according to your joystick configuration
+        speed_msg.data = msg->axes[3]; // Adjust according to your joystick configuration
         steer_msg.data = msg->axes[0]; // Adjust according to your joystick configuration
 
         speed_publisher_->publish(speed_msg);

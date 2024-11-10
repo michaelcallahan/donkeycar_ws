@@ -111,8 +111,8 @@ private:
     int steer_angle_ = 0;
     int motor_speed_ = 0;
 
-    int steer_left_ = 300, steer_center_ = 350, steer_right_ = 400;
-    int throttle_reverse_ = 300, throttle_zero_ = 350, throttle_forward_ = 430;
+    int steer_left_ = 295, steer_center_ = 345, steer_right_ = 395;
+    int throttle_reverse_ = 290, throttle_zero_ = 340, throttle_forward_ = 390;
 };
 
 int main(int argc, char * argv[])

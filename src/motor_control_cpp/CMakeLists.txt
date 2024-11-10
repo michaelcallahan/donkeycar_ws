@@ -23,7 +23,7 @@ include_directories(${I2CDEV_INCLUDE_DIRS})
 add_executable(motor_control_node src/motor_control_node.cpp)
 ament_target_dependencies(motor_control_node rclcpp std_msgs)
 
-add_executable(motor_control_node src/motor_control_node_arduino_test.cpp)
+add_executable(motor_control_node_arduino_test src/motor_control_node_arduino_test.cpp)
 ament_target_dependencies(motor_control_node_arduino_test rclcpp std_msgs)
 
 # Link libgpiod and I2C-dev libraries

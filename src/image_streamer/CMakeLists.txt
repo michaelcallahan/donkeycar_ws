@@ -36,7 +36,7 @@ target_link_libraries(image_streamer
   ${cv_bridge_LIBRARIES}
 )
 
-target_link_libraries(image_streamer_2
+target_link_libraries(image_streamer_test
   ${OpenCV_LIBRARIES}
   ${GST_LIBRARIES}
   ${GST_APP_LIBRARIES}
@@ -48,7 +48,7 @@ install(TARGETS
   DESTINATION lib/${PROJECT_NAME})
 
   install(TARGETS
-  image_streamer_2
+  image_streamer_test
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
